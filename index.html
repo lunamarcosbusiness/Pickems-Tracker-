@@ -2,245 +2,647 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#080c12">
+
 <title>NFL Pick'em Tracker</title>
 
 <style>
-    * {
-        box-sizing: border-box;
-        margin: 0;
-        padding: 0;
+:root {
+    --bg: #080c12;
+    --card: #111821;
+    --card2: #161f2a;
+    --border: #263241;
+    --text: #f5f7fa;
+    --muted: #8d99a8;
+    --green: #3ddc84;
+    --gold: #f6c453;
+    --red: #ff5d5d;
+    --blue: #5aa9ff;
+}
+
+* {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    padding-bottom: 100px;
+}
+
+.app {
+    max-width: 760px;
+    margin: auto;
+    padding: 22px 16px;
+}
+
+.header {
+    margin-bottom: 22px;
+}
+
+.header h1 {
+    margin: 0;
+    font-size: 30px;
+}
+
+.header p {
+    color: var(--muted);
+    margin: 6px 0 0;
+}
+
+.week-badge {
+    display: inline-block;
+    background: rgba(246,196,83,.12);
+    color: var(--gold);
+    border: 1px solid rgba(246,196,83,.35);
+    padding: 7px 12px;
+    border-radius: 100px;
+    font-size: 13px;
+    font-weight: 700;
+    margin-top: 12px;
+}
+
+.section-title {
+    margin: 28px 0 12px;
+    font-size: 19px;
+}
+
+.hero {
+    background: linear-gradient(145deg, #15251e, #101820);
+    border: 1px solid rgba(61,220,132,.35);
+    border-radius: 20px;
+    padding: 22px;
+    margin-bottom: 12px;
+}
+
+.label {
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: .7px;
+}
+
+.hero-number {
+    font-size: 44px;
+    font-weight: 800;
+    color: var(--green);
+    margin-top: 5px;
+}
+
+.hero-sub {
+    color: var(--muted);
+    margin-top: 4px;
+    font-size: 13px;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(2,1fr);
+    gap: 10px;
+}
+
+.stat {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 15px;
+    padding: 16px;
+}
+
+.stat-value {
+    font-size: 23px;
+    font-weight: 800;
+    margin-top: 5px;
+}
+
+.gold { color: var(--gold); }
+.green { color: var(--green); }
+.red { color: var(--red); }
+.blue { color: var(--blue); }
+
+.player-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 18px;
+    margin-bottom: 12px;
+}
+
+.player-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.player-name {
+    font-size: 21px;
+    font-weight: 800;
+}
+
+.paid-badge {
+    background: rgba(61,220,132,.12);
+    color: var(--green);
+    border: 1px solid rgba(61,220,132,.25);
+    padding: 5px 9px;
+    border-radius: 100px;
+    font-size: 11px;
+    font-weight: 800;
+}
+
+.owes-badge {
+    background: rgba(255,93,93,.1);
+    color: var(--red);
+    border: 1px solid rgba(255,93,93,.25);
+    padding: 5px 9px;
+    border-radius: 100px;
+    font-size: 11px;
+    font-weight: 800;
+}
+
+.player-stats {
+    display: grid;
+    grid-template-columns: repeat(2,1fr);
+    gap: 8px;
+    margin-top: 15px;
+}
+
+.mini {
+    background: #0c1219;
+    border-radius: 11px;
+    padding: 11px;
+}
+
+.mini-label {
+    color: var(--muted);
+    font-size: 11px;
+}
+
+.mini-value {
+    font-weight: 800;
+    font-size: 17px;
+    margin-top: 3px;
+}
+
+.payment-box {
+    margin-top: 15px;
+    display: flex;
+    gap: 8px;
+}
+
+input, select, textarea {
+    width: 100%;
+    background: #090e14;
+    border: 1px solid var(--border);
+    color: white;
+    border-radius: 11px;
+    padding: 12px;
+    font-size: 16px;
+    outline: none;
+}
+
+input:focus, select:focus, textarea:focus {
+    border-color: var(--blue);
+}
+
+button {
+    border: 0;
+    border-radius: 11px;
+    padding: 12px 15px;
+    font-size: 14px;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.primary {
+    background: var(--green);
+    color: #04140b;
+    white-space: nowrap;
+}
+
+.secondary {
+    background: #202a36;
+    color: white;
+}
+
+.danger {
+    background: rgba(255,93,93,.12);
+    color: var(--red);
+}
+
+.history {
+    margin-top: 14px;
+    border-top: 1px solid var(--border);
+    padding-top: 10px;
+}
+
+.history-row {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    gap: 10px;
+    align-items: center;
+    padding: 9px 0;
+    border-bottom: 1px solid rgba(38,50,65,.5);
+    font-size: 13px;
+}
+
+.history-date {
+    color: var(--muted);
+}
+
+.delete-small {
+    background: transparent;
+    color: var(--red);
+    padding: 5px;
+}
+
+.week-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 15px;
+    padding: 15px;
+    margin-bottom: 9px;
+}
+
+.week-card.current {
+    border-color: var(--gold);
+    box-shadow: 0 0 0 1px rgba(246,196,83,.1);
+}
+
+.week-top {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.week-name {
+    font-weight: 800;
+}
+
+.current-text {
+    color: var(--gold);
+    font-size: 11px;
+    font-weight: 800;
+}
+
+.week-result {
+    margin-top: 9px;
+    color: var(--muted);
+    font-size: 13px;
+}
+
+.standing {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 15px;
+    display: grid;
+    grid-template-columns: 35px 1fr auto;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.rank {
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--gold);
+}
+
+.standing-name {
+    font-weight: 800;
+}
+
+.standing-sub {
+    color: var(--muted);
+    font-size: 12px;
+    margin-top: 3px;
+}
+
+.standing-money {
+    font-weight: 800;
+    color: var(--green);
+}
+
+.settings-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 16px;
+    margin-bottom: 12px;
+}
+
+.settings-card label {
+    display: block;
+    color: var(--muted);
+    font-size: 12px;
+    margin-bottom: 7px;
+}
+
+.champion {
+    background: linear-gradient(145deg, #241f12, #111821);
+    border: 1px solid rgba(246,196,83,.45);
+}
+
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(10,14,20,.94);
+    backdrop-filter: blur(18px);
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: center;
+    padding-bottom: env(safe-area-inset-bottom);
+    z-index: 20;
+}
+
+.nav-inner {
+    max-width: 760px;
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(4,1fr);
+}
+
+.nav-btn {
+    background: transparent;
+    color: var(--muted);
+    padding: 13px 4px 10px;
+    font-size: 11px;
+    border-radius: 0;
+}
+
+.nav-btn span {
+    display: block;
+    font-size: 21px;
+    margin-bottom: 3px;
+}
+
+.nav-btn.active {
+    color: var(--green);
+}
+
+.page {
+    display: none;
+}
+
+.page.active {
+    display: block;
+}
+
+.money-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(38,50,65,.55);
+}
+
+.money-row:last-child {
+    border-bottom: 0;
+}
+
+.money-row span:first-child {
+    color: var(--muted);
+}
+
+.warning {
+    color: var(--gold);
+    font-size: 12px;
+    line-height: 1.5;
+    margin-top: 10px;
+}
+
+@media(min-width: 650px) {
+    .grid {
+        grid-template-columns: repeat(4,1fr);
     }
 
-    body {
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-        background: #0b0f14;
-        color: white;
-        padding: 20px;
+    .player-stats {
+        grid-template-columns: repeat(4,1fr);
     }
-
-    .container {
-        max-width: 850px;
-        margin: auto;
-    }
-
-    h1 {
-        font-size: 30px;
-        margin-bottom: 5px;
-    }
-
-    .subtitle {
-        color: #8b949e;
-        margin-bottom: 25px;
-    }
-
-    .dashboard {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 12px;
-        margin-bottom: 25px;
-    }
-
-    .stat {
-        background: #161b22;
-        border: 1px solid #30363d;
-        border-radius: 14px;
-        padding: 18px;
-    }
-
-    .stat-title {
-        color: #8b949e;
-        font-size: 13px;
-        margin-bottom: 7px;
-    }
-
-    .stat-number {
-        font-size: 27px;
-        font-weight: 700;
-    }
-
-    .green {
-        color: #3fb950;
-    }
-
-    .gold {
-        color: #f0b429;
-    }
-
-    .players {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 12px;
-        margin-bottom: 30px;
-    }
-
-    .player {
-        background: #161b22;
-        border: 1px solid #30363d;
-        border-radius: 14px;
-        padding: 16px;
-    }
-
-    .player h3 {
-        margin-bottom: 12px;
-    }
-
-    .player-row {
-        display: flex;
-        justify-content: space-between;
-        margin: 7px 0;
-        color: #c9d1d9;
-    }
-
-    h2 {
-        margin-bottom: 15px;
-    }
-
-    .week {
-        background: #161b22;
-        border: 1px solid #30363d;
-        border-radius: 12px;
-        padding: 14px;
-        margin-bottom: 9px;
-
-        display: grid;
-        grid-template-columns: 1.4fr 1fr 1fr;
-        align-items: center;
-        gap: 10px;
-    }
-
-    .week.current {
-        border-color: #f0b429;
-    }
-
-    .week-title {
-        font-weight: 600;
-    }
-
-    select {
-        width: 100%;
-        background: #0d1117;
-        color: white;
-        border: 1px solid #30363d;
-        padding: 9px;
-        border-radius: 8px;
-    }
-
-    .prize {
-        text-align: right;
-        font-weight: bold;
-        color: #3fb950;
-    }
-
-    .season-winner {
-        margin-top: 30px;
-        background: linear-gradient(135deg, #242017, #161b22);
-        border: 1px solid #f0b429;
-        border-radius: 16px;
-        padding: 20px;
-    }
-
-    .season-winner select {
-        margin-top: 12px;
-    }
-
-    .reset {
-        margin-top: 25px;
-        width: 100%;
-        padding: 13px;
-        border: none;
-        border-radius: 10px;
-        background: #21262d;
-        color: #f85149;
-        font-weight: 600;
-        cursor: pointer;
-    }
-
-    @media(max-width: 650px) {
-        .dashboard,
-        .players {
-            grid-template-columns: 1fr;
-        }
-
-        .week {
-            grid-template-columns: 1fr;
-        }
-
-        .prize {
-            text-align: left;
-        }
-    }
+}
 </style>
 </head>
 
 <body>
 
-<div class="container">
+<div class="app">
 
-    <h1>🏈 NFL Pick'em</h1>
-    <div class="subtitle">2026 Season Money Tracker</div>
-
-    <div class="dashboard">
-
-        <div class="stat">
-            <div class="stat-title">CURRENT POT</div>
-            <div class="stat-number green" id="currentPot">$820</div>
-        </div>
-
-        <div class="stat">
-            <div class="stat-title">TOTAL COLLECTED</div>
-            <div class="stat-number" id="collected">$920</div>
-        </div>
-
-        <div class="stat">
-            <div class="stat-title">SEASON CHAMPION PRIZE</div>
-            <div class="stat-number gold">$220</div>
-        </div>
-
+    <div class="header">
+        <h1>🏈 NFL Pick'em</h1>
+        <p>2026 Season Money Tracker</p>
+        <div class="week-badge" id="headerWeek">WEEK 3</div>
     </div>
 
-    <div class="players" id="players"></div>
+    <!-- DASHBOARD -->
+    <section id="dashboardPage" class="page active">
 
-    <h2>Weekly Winners</h2>
+        <div class="hero">
+            <div class="label">CURRENT POOL BALANCE</div>
+            <div class="hero-number" id="currentPool">$920</div>
+            <div class="hero-sub">
+                Money collected minus weekly prizes awarded
+            </div>
+        </div>
 
-    <div id="weeks"></div>
+        <div class="grid">
 
-    <div class="season-winner">
-        <h2>🏆 Season Champion</h2>
-        <p>Final prize: <strong class="gold">$220</strong></p>
+            <div class="stat">
+                <div class="label">COLLECTED</div>
+                <div class="stat-value" id="totalCollected">$1,020</div>
+            </div>
 
-        <select id="seasonWinner" onchange="saveData()">
-            <option value="">TBD</option>
-            <option>Arcadio</option>
-            <option>Marco</option>
-            <option>Marcos</option>
-        </select>
-    </div>
+            <div class="stat">
+                <div class="label">PAID OUT</div>
+                <div class="stat-value red" id="totalPaidOut">$100</div>
+            </div>
 
-    <button class="reset" onclick="resetTracker()">
-        Reset Tracker
-    </button>
+            <div class="stat">
+                <div class="label">STILL OWED</div>
+                <div class="stat-value gold" id="totalOwed">$300</div>
+            </div>
+
+            <div class="stat">
+                <div class="label">CHAMPION PRIZE</div>
+                <div class="stat-value gold" id="championPrize">$220</div>
+            </div>
+
+        </div>
+
+        <h2 class="section-title">🏆 Standings</h2>
+        <div id="dashboardStandings"></div>
+
+        <h2 class="section-title">Season Money</h2>
+
+        <div class="settings-card">
+            <div class="money-row">
+                <span>Total season contributions</span>
+                <strong id="seasonContributions">$1,320</strong>
+            </div>
+
+            <div class="money-row">
+                <span>Total weekly prize money</span>
+                <strong id="seasonWeeklyPrizes">$1,100</strong>
+            </div>
+
+            <div class="money-row">
+                <span>Weekly prizes remaining</span>
+                <strong id="weeklyPrizesRemaining">$1,000</strong>
+            </div>
+
+            <div class="money-row">
+                <span>Projected season champion prize</span>
+                <strong class="gold" id="projectedChampion">$220</strong>
+            </div>
+        </div>
+
+    </section>
+
+
+    <!-- PAYMENTS -->
+    <section id="paymentsPage" class="page">
+
+        <h2 class="section-title">💵 Payments</h2>
+
+        <p style="color:var(--muted); margin-top:-5px;">
+            Enter any amount a player gives you. Everything recalculates automatically.
+        </p>
+
+        <div id="paymentPlayers"></div>
+
+    </section>
+
+
+    <!-- WEEKS -->
+    <section id="weeksPage" class="page">
+
+        <h2 class="section-title">📅 Weekly Results</h2>
+
+        <div class="settings-card">
+            <label>Current Week / Round</label>
+            <select id="currentWeekSelect" onchange="changeCurrentWeek(this.value)">
+            </select>
+        </div>
+
+        <div id="weekList"></div>
+
+    </section>
+
+
+    <!-- SETTINGS / SEASON -->
+    <section id="seasonPage" class="page">
+
+        <h2 class="section-title">🏆 Season</h2>
+
+        <div class="settings-card champion">
+
+            <label>Season Champion</label>
+
+            <select id="seasonChampion" onchange="setSeasonChampion(this.value)">
+                <option value="">TBD</option>
+                <option value="Arcadio">Arcadio</option>
+                <option value="Marco">Marco</option>
+                <option value="Marcos">Marcos</option>
+            </select>
+
+            <div style="margin-top:15px;">
+                <div class="label">CHAMPION PRIZE</div>
+                <div class="stat-value gold" id="seasonChampionPrize">$220</div>
+            </div>
+
+        </div>
+
+        <h2 class="section-title">Season Settings</h2>
+
+        <div class="settings-card">
+
+            <label>Weekly Entry Per Player</label>
+            <input
+                id="weeklyEntry"
+                type="number"
+                inputmode="decimal"
+                value="20"
+                onchange="updateSetting('weeklyEntry', this.value)"
+            >
+
+            <br><br>
+
+            <label>Weekly Winner Prize</label>
+            <input
+                id="weeklyPrize"
+                type="number"
+                inputmode="decimal"
+                value="50"
+                onchange="updateSetting('weeklyPrize', this.value)"
+            >
+
+            <p class="warning">
+                Changing these settings recalculates the season totals.
+            </p>
+
+        </div>
+
+        <h2 class="section-title">Data</h2>
+
+        <div class="settings-card">
+
+            <button
+                class="danger"
+                style="width:100%;"
+                onclick="resetEverything()"
+            >
+                Reset Entire Tracker
+            </button>
+
+            <p class="warning">
+                This permanently clears payments and weekly results stored on this device.
+            </p>
+
+        </div>
+
+    </section>
 
 </div>
 
+
+<!-- NAVIGATION -->
+<div class="bottom-nav">
+
+    <div class="nav-inner">
+
+        <button class="nav-btn active" onclick="showPage('dashboard',this)">
+            <span>🏠</span>
+            Dashboard
+        </button>
+
+        <button class="nav-btn" onclick="showPage('payments',this)">
+            <span>💵</span>
+            Payments
+        </button>
+
+        <button class="nav-btn" onclick="showPage('weeks',this)">
+            <span>📅</span>
+            Weeks
+        </button>
+
+        <button class="nav-btn" onclick="showPage('season',this)">
+            <span>🏆</span>
+            Season
+        </button>
+
+    </div>
+
+</div>
+
+
 <script>
 
-const players = {
-    Arcadio: {
-        dues: 440,
-        paid: 440
-    },
-
-    Marco: {
-        dues: 440,
-        paid: 40
-    },
-
-    Marcos: {
-        dues: 440,
-        paid: 440
-    }
-};
+const STORAGE_KEY = "nflPickemCommissioner2026";
 
 const weekNames = [
     "Week 1",
@@ -267,225 +669,836 @@ const weekNames = [
     "Super Bowl"
 ];
 
-const WEEKLY_PRIZE = 50;
+function initialState() {
 
-let winners = Array(22).fill("");
+    return {
 
-// Marco won first two weeks
-winners[0] = "Marco";
-winners[1] = "Marco";
+        weeklyEntry: 20,
+        weeklyPrize: 50,
 
-function loadData() {
+        currentWeek: 2,
 
-    const saved = localStorage.getItem("nflPickemTracker");
+        seasonChampion: "",
+
+        players: {
+
+            Arcadio: {
+                startingPaid: 440,
+                payments: []
+            },
+
+            Marco: {
+                startingPaid: 40,
+
+                payments: [
+                    {
+                        id: Date.now() + 1,
+                        amount: 100,
+                        date: new Date().toLocaleDateString(),
+                        note: "Pool payment"
+                    }
+                ]
+            },
+
+            Marcos: {
+                startingPaid: 440,
+                payments: []
+            }
+
+        },
+
+        winners: [
+            "Marco",
+            "Marco",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+        ]
+    };
+}
+
+
+let state = loadState();
+
+
+function loadState() {
+
+    const saved = localStorage.getItem(STORAGE_KEY);
 
     if (saved) {
 
-        const data = JSON.parse(saved);
+        try {
 
-        if (data.winners) {
-            winners = data.winners;
-        }
+            const parsed = JSON.parse(saved);
 
-        if (data.players) {
-            Object.assign(players, data.players);
-        }
+            return parsed;
 
-        if (data.seasonWinner) {
-            document.getElementById("seasonWinner").value =
-                data.seasonWinner;
+        } catch (error) {
+
+            console.error("Could not load saved data.", error);
         }
     }
 
-    render();
+    return initialState();
 }
 
-function saveData() {
 
-    const seasonWinner =
-        document.getElementById("seasonWinner").value;
+function saveState() {
 
     localStorage.setItem(
-        "nflPickemTracker",
-        JSON.stringify({
-            winners,
-            players,
-            seasonWinner
-        })
+        STORAGE_KEY,
+        JSON.stringify(state)
     );
 
-    render();
+    renderEverything();
 }
 
-function render() {
 
-    renderPlayers();
-    renderWeeks();
-    updateMoney();
+function money(value) {
+
+    return "$" + Number(value).toLocaleString(
+        "en-US",
+        {
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 2
+        }
+    );
 }
 
-function renderPlayers() {
+
+function playerSeasonDues() {
+
+    return state.weeklyEntry * weekNames.length;
+}
+
+
+function totalSeasonContributions() {
+
+    return playerSeasonDues() *
+        Object.keys(state.players).length;
+}
+
+
+function totalSeasonWeeklyPrizes() {
+
+    return state.weeklyPrize *
+        weekNames.length;
+}
+
+
+function championPrize() {
+
+    return totalSeasonContributions() -
+        totalSeasonWeeklyPrizes();
+}
+
+
+function playerTotalPaid(name) {
+
+    const player = state.players[name];
+
+    let total = Number(player.startingPaid || 0);
+
+    player.payments.forEach(payment => {
+
+        total += Number(payment.amount);
+
+    });
+
+    return total;
+}
+
+
+function playerOwed(name) {
+
+    return Math.max(
+        0,
+        playerSeasonDues() - playerTotalPaid(name)
+    );
+}
+
+
+function playerWins(name) {
+
+    return state.winners.filter(
+        winner => winner === name
+    ).length;
+}
+
+
+function playerWinnings(name) {
+
+    return playerWins(name) *
+        state.weeklyPrize;
+}
+
+
+function totalCollected() {
+
+    return Object.keys(state.players)
+        .reduce(
+            (sum,name) =>
+                sum + playerTotalPaid(name),
+            0
+        );
+}
+
+
+function totalAwarded() {
+
+    const completed =
+        state.winners.filter(
+            winner => winner !== ""
+        ).length;
+
+    return completed *
+        state.weeklyPrize;
+}
+
+
+function currentPool() {
+
+    return totalCollected() -
+        totalAwarded();
+}
+
+
+function totalOwed() {
+
+    return Object.keys(state.players)
+        .reduce(
+            (sum,name) =>
+                sum + playerOwed(name),
+            0
+        );
+}
+
+
+function addPayment(name) {
+
+    const input =
+        document.getElementById(
+            "paymentInput-" + name
+        );
+
+    const amount =
+        Number(input.value);
+
+    if (!amount || amount <= 0) {
+
+        alert("Enter a valid payment amount.");
+
+        return;
+    }
+
+    const noteInput =
+        document.getElementById(
+            "paymentNote-" + name
+        );
+
+    state.players[name].payments.push({
+
+        id: Date.now(),
+
+        amount: amount,
+
+        date: new Date().toLocaleDateString(),
+
+        note:
+            noteInput.value.trim() ||
+            "Pool payment"
+
+    });
+
+    input.value = "";
+    noteInput.value = "";
+
+    saveState();
+}
+
+
+function deletePayment(name,id) {
+
+    const payment =
+        state.players[name].payments.find(
+            item => item.id === id
+        );
+
+    if (!payment) return;
+
+    const okay = confirm(
+        "Delete this " +
+        money(payment.amount) +
+        " payment from " +
+        name +
+        "?"
+    );
+
+    if (!okay) return;
+
+    state.players[name].payments =
+        state.players[name].payments.filter(
+            item => item.id !== id
+        );
+
+    saveState();
+}
+
+
+function setWinner(index,winner) {
+
+    state.winners[index] = winner;
+
+    saveState();
+}
+
+
+function changeCurrentWeek(value) {
+
+    state.currentWeek = Number(value);
+
+    saveState();
+}
+
+
+function setSeasonChampion(value) {
+
+    state.seasonChampion = value;
+
+    saveState();
+}
+
+
+function updateSetting(setting,value) {
+
+    const number = Number(value);
+
+    if (!number || number < 0) {
+
+        alert("Enter a valid amount.");
+
+        renderEverything();
+
+        return;
+    }
+
+    state[setting] = number;
+
+    saveState();
+}
+
+
+function renderDashboard() {
+
+    document.getElementById("currentPool")
+        .textContent =
+        money(currentPool());
+
+    document.getElementById("totalCollected")
+        .textContent =
+        money(totalCollected());
+
+    document.getElementById("totalPaidOut")
+        .textContent =
+        money(totalAwarded());
+
+    document.getElementById("totalOwed")
+        .textContent =
+        money(totalOwed());
+
+    document.getElementById("championPrize")
+        .textContent =
+        money(championPrize());
+
+    document.getElementById("seasonContributions")
+        .textContent =
+        money(totalSeasonContributions());
+
+    document.getElementById("seasonWeeklyPrizes")
+        .textContent =
+        money(totalSeasonWeeklyPrizes());
+
+    document.getElementById("weeklyPrizesRemaining")
+        .textContent =
+        money(
+            totalSeasonWeeklyPrizes() -
+            totalAwarded()
+        );
+
+    document.getElementById("projectedChampion")
+        .textContent =
+        money(championPrize());
+
+
+    const standings =
+        Object.keys(state.players)
+        .map(name => ({
+            name: name,
+            wins: playerWins(name),
+            winnings: playerWinnings(name)
+        }))
+        .sort(
+            (a,b) =>
+                b.wins - a.wins
+        );
+
 
     const container =
-        document.getElementById("players");
+        document.getElementById(
+            "dashboardStandings"
+        );
 
     container.innerHTML = "";
 
-    Object.keys(players).forEach(name => {
-
-        const player = players[name];
-
-        const wins =
-            winners.filter(w => w === name).length;
-
-        const winnings =
-            wins * WEEKLY_PRIZE;
-
-        const owed =
-            player.dues - player.paid;
+    standings.forEach((player,index) => {
 
         container.innerHTML += `
-            <div class="player">
 
-                <h3>${name}</h3>
+        <div class="standing">
 
-                <div class="player-row">
-                    <span>Paid</span>
-                    <strong>$${player.paid}</strong>
+            <div class="rank">
+                ${index + 1}
+            </div>
+
+            <div>
+
+                <div class="standing-name">
+                    ${player.name}
                 </div>
 
-                <div class="player-row">
-                    <span>Owes</span>
-                    <strong>
-                        $${owed}
-                    </strong>
-                </div>
-
-                <div class="player-row">
-                    <span>Weekly Wins</span>
-                    <strong>${wins}</strong>
-                </div>
-
-                <div class="player-row">
-                    <span>Winnings</span>
-                    <strong class="green">
-                        $${winnings}
-                    </strong>
+                <div class="standing-sub">
+                    ${player.wins}
+                    ${player.wins === 1 ? "win" : "wins"}
                 </div>
 
             </div>
+
+            <div class="standing-money">
+                ${money(player.winnings)}
+            </div>
+
+        </div>
+
         `;
     });
 }
+
+
+function renderPayments() {
+
+    const container =
+        document.getElementById(
+            "paymentPlayers"
+        );
+
+    container.innerHTML = "";
+
+
+    Object.keys(state.players)
+    .forEach(name => {
+
+        const paid =
+            playerTotalPaid(name);
+
+        const owed =
+            playerOwed(name);
+
+        const status =
+            owed === 0
+            ? `<span class="paid-badge">
+                    PAID IN FULL ✓
+               </span>`
+            : `<span class="owes-badge">
+                    OWES ${money(owed)}
+               </span>`;
+
+
+        const history =
+            state.players[name].payments
+            .slice()
+            .reverse()
+            .map(payment => `
+
+                <div class="history-row">
+
+                    <div>
+                        <strong>
+                            +${money(payment.amount)}
+                        </strong>
+
+                        <div class="history-date">
+                            ${payment.date}
+                            •
+                            ${payment.note}
+                        </div>
+                    </div>
+
+                    <div></div>
+
+                    <button
+                        class="delete-small"
+                        onclick="deletePayment(
+                            '${name}',
+                            ${payment.id}
+                        )"
+                    >
+                        Delete
+                    </button>
+
+                </div>
+
+            `)
+            .join("");
+
+
+        container.innerHTML += `
+
+        <div class="player-card">
+
+            <div class="player-top">
+
+                <div class="player-name">
+                    ${name}
+                </div>
+
+                ${status}
+
+            </div>
+
+
+            <div class="player-stats">
+
+                <div class="mini">
+                    <div class="mini-label">
+                        SEASON DUES
+                    </div>
+                    <div class="mini-value">
+                        ${money(playerSeasonDues())}
+                    </div>
+                </div>
+
+                <div class="mini">
+                    <div class="mini-label">
+                        PAID
+                    </div>
+                    <div class="mini-value green">
+                        ${money(paid)}
+                    </div>
+                </div>
+
+                <div class="mini">
+                    <div class="mini-label">
+                        REMAINING
+                    </div>
+                    <div class="mini-value
+                        ${owed > 0 ? "red" : "green"}">
+                        ${money(owed)}
+                    </div>
+                </div>
+
+                <div class="mini">
+                    <div class="mini-label">
+                        WINNINGS
+                    </div>
+                    <div class="mini-value gold">
+                        ${money(playerWinnings(name))}
+                    </div>
+                </div>
+
+            </div>
+
+
+            <div class="payment-box">
+
+                <input
+                    id="paymentInput-${name}"
+                    type="number"
+                    inputmode="decimal"
+                    placeholder="Payment amount"
+                >
+
+                <button
+                    class="primary"
+                    onclick="addPayment('${name}')"
+                >
+                    + Add
+                </button>
+
+            </div>
+
+
+            <div style="margin-top:8px;">
+
+                <input
+                    id="paymentNote-${name}"
+                    type="text"
+                    placeholder="Optional note"
+                >
+
+            </div>
+
+
+            ${
+                history
+                ? `
+                <div class="history">
+                    <div class="label">
+                        NEW PAYMENT HISTORY
+                    </div>
+                    ${history}
+                </div>
+                `
+                : ""
+            }
+
+        </div>
+
+        `;
+
+    });
+}
+
 
 function renderWeeks() {
 
+    const select =
+        document.getElementById(
+            "currentWeekSelect"
+        );
+
+    select.innerHTML = "";
+
+    weekNames.forEach((week,index) => {
+
+        select.innerHTML += `
+
+        <option
+            value="${index}"
+            ${
+                index === state.currentWeek
+                ? "selected"
+                : ""
+            }
+        >
+            ${week}
+        </option>
+
+        `;
+    });
+
+
     const container =
-        document.getElementById("weeks");
+        document.getElementById(
+            "weekList"
+        );
 
     container.innerHTML = "";
 
-    weekNames.forEach((week, index) => {
 
-        const current =
-            index === 2 ? "current" : "";
+    weekNames.forEach((week,index) => {
+
+        const winner =
+            state.winners[index];
+
+        const isCurrent =
+            index === state.currentWeek;
+
 
         container.innerHTML += `
-            <div class="week ${current}">
 
-                <div class="week-title">
+        <div class="week-card
+            ${isCurrent ? "current" : ""}">
+
+            <div class="week-top">
+
+                <div class="week-name">
                     ${week}
-                    ${index === 2 ? " • CURRENT" : ""}
                 </div>
 
-                <select
-                    onchange="changeWinner(${index}, this.value)"
-                >
-
-                    <option value="">
-                        TBD
-                    </option>
-
-                    <option
-                        ${winners[index] === "Arcadio"
-                        ? "selected" : ""}>
-                        Arcadio
-                    </option>
-
-                    <option
-                        ${winners[index] === "Marco"
-                        ? "selected" : ""}>
-                        Marco
-                    </option>
-
-                    <option
-                        ${winners[index] === "Marcos"
-                        ? "selected" : ""}>
-                        Marcos
-                    </option>
-
-                </select>
-
-                <div class="prize">
-                    ${winners[index]
-                        ? "$50 → " + winners[index]
-                        : "$50 Prize"}
-                </div>
+                ${
+                    isCurrent
+                    ? `<div class="current-text">
+                           CURRENT
+                       </div>`
+                    : ""
+                }
 
             </div>
+
+
+            <select
+                onchange="
+                    setWinner(
+                        ${index},
+                        this.value
+                    )
+                "
+            >
+
+                <option value=""
+                    ${winner === "" ? "selected" : ""}>
+                    Select weekly winner
+                </option>
+
+                <option value="Arcadio"
+                    ${winner === "Arcadio" ? "selected" : ""}>
+                    Arcadio
+                </option>
+
+                <option value="Marco"
+                    ${winner === "Marco" ? "selected" : ""}>
+                    Marco
+                </option>
+
+                <option value="Marcos"
+                    ${winner === "Marcos" ? "selected" : ""}>
+                    Marcos
+                </option>
+
+            </select>
+
+
+            <div class="week-result">
+
+                ${
+                    winner
+                    ? `🏆 ${winner} won
+                       ${money(state.weeklyPrize)}`
+                    : `${money(state.weeklyPrize)}
+                       weekly prize • Winner TBD`
+                }
+
+            </div>
+
+        </div>
+
         `;
+
     });
 }
 
-function changeWinner(index, winner) {
 
-    winners[index] = winner;
+function renderSeason() {
 
-    saveData();
+    document.getElementById(
+        "seasonChampion"
+    ).value =
+        state.seasonChampion || "";
+
+    document.getElementById(
+        "seasonChampionPrize"
+    ).textContent =
+        money(championPrize());
+
+    document.getElementById(
+        "weeklyEntry"
+    ).value =
+        state.weeklyEntry;
+
+    document.getElementById(
+        "weeklyPrize"
+    ).value =
+        state.weeklyPrize;
 }
 
-function updateMoney() {
 
-    let totalCollected = 0;
+function renderHeader() {
 
-    Object.values(players).forEach(player => {
-        totalCollected += player.paid;
-    });
-
-    const completedWeeks =
-        winners.filter(w => w !== "").length;
-
-    const payouts =
-        completedWeeks * WEEKLY_PRIZE;
-
-    const currentPot =
-        totalCollected - payouts;
-
-    document.getElementById("collected")
-        .textContent =
-        "$" + totalCollected;
-
-    document.getElementById("currentPot")
-        .textContent =
-        "$" + currentPot;
+    document.getElementById(
+        "headerWeek"
+    ).textContent =
+        weekNames[state.currentWeek]
+        .toUpperCase();
 }
 
-function resetTracker() {
 
-    if (
-        confirm(
-            "Are you sure you want to reset the tracker?"
-        )
-    ) {
-        localStorage.removeItem(
-            "nflPickemTracker"
+function renderEverything() {
+
+    renderHeader();
+    renderDashboard();
+    renderPayments();
+    renderWeeks();
+    renderSeason();
+}
+
+
+function showPage(page,button) {
+
+    document
+        .querySelectorAll(".page")
+        .forEach(item =>
+            item.classList.remove("active")
         );
 
-        location.reload();
-    }
+
+    document
+        .querySelectorAll(".nav-btn")
+        .forEach(item =>
+            item.classList.remove("active")
+        );
+
+
+    document.getElementById(
+        page + "Page"
+    ).classList.add("active");
+
+
+    button.classList.add("active");
+
+
+    window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+    });
 }
 
-loadData();
+
+function resetEverything() {
+
+    const first =
+        confirm(
+            "Reset the entire NFL Pick'em tracker?"
+        );
+
+    if (!first) return;
+
+
+    const second =
+        confirm(
+            "This will delete all payments and weekly results stored on this device. Continue?"
+        );
+
+    if (!second) return;
+
+
+    localStorage.removeItem(
+        STORAGE_KEY
+    );
+
+    state = initialState();
+
+    saveState();
+}
+
+
+renderEverything();
 
 </script>
 
