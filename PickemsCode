@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NFL Pick'em Tracker</title>
+
+<style>
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        background: #0b0f14;
+        color: white;
+        padding: 20px;
+    }
+
+    .container {
+        max-width: 850px;
+        margin: auto;
+    }
+
+    h1 {
+        font-size: 30px;
+        margin-bottom: 5px;
+    }
+
+    .subtitle {
+        color: #8b949e;
+        margin-bottom: 25px;
+    }
+
+    .dashboard {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+        margin-bottom: 25px;
+    }
+
+    .stat {
+        background: #161b22;
+        border: 1px solid #30363d;
+        border-radius: 14px;
+        padding: 18px;
+    }
+
+    .stat-title {
+        color: #8b949e;
+        font-size: 13px;
+        margin-bottom: 7px;
+    }
+
+    .stat-number {
+        font-size: 27px;
+        font-weight: 700;
+    }
+
+    .green {
+        color: #3fb950;
+    }
+
+    .gold {
+        color: #f0b429;
+    }
+
+    .players {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+        margin-bottom: 30px;
+    }
+
+    .player {
+        background: #161b22;
+        border: 1px solid #30363d;
+        border-radius: 14px;
+        padding: 16px;
+    }
+
+    .player h3 {
+        margin-bottom: 12px;
+    }
+
+    .player-row {
+        display: flex;
+        justify-content: space-between;
+        margin: 7px 0;
+        color: #c9d1d9;
+    }
+
+    h2 {
+        margin-bottom: 15px;
+    }
+
+    .week {
+        background: #161b22;
+        border: 1px solid #30363d;
+        border-radius: 12px;
+        padding: 14px;
+        margin-bottom: 9px;
+
+        display: grid;
+        grid-template-columns: 1.4fr 1fr 1fr;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .week.current {
+        border-color: #f0b429;
+    }
+
+    .week-title {
+        font-weight: 600;
+    }
+
+    select {
+        width: 100%;
+        background: #0d1117;
+        color: white;
+        border: 1px solid #30363d;
+        padding: 9px;
+        border-radius: 8px;
+    }
+
+    .prize {
+        text-align: right;
+        font-weight: bold;
+        color: #3fb950;
+    }
+
+    .season-winner {
+        margin-top: 30px;
+        background: linear-gradient(135deg, #242017, #161b22);
+        border: 1px solid #f0b429;
+        border-radius: 16px;
+        padding: 20px;
+    }
+
+    .season-winner select {
+        margin-top: 12px;
+    }
+
+    .reset {
+        margin-top: 25px;
+        width: 100%;
+        padding: 13px;
+        border: none;
+        border-radius: 10px;
+        background: #21262d;
+        color: #f85149;
+        font-weight: 600;
+        cursor: pointer;
+    }
+
+    @media(max-width: 650px) {
+        .dashboard,
+        .players {
+            grid-template-columns: 1fr;
+        }
+
+        .week {
+            grid-template-columns: 1fr;
+        }
+
+        .prize {
+            text-align: left;
+        }
+    }
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>🏈 NFL Pick'em</h1>
+    <div class="subtitle">2026 Season Money Tracker</div>
+
+    <div class="dashboard">
+
+        <div class="stat">
+            <div class="stat-title">CURRENT POT</div>
+            <div class="stat-number green" id="currentPot">$820</div>
+        </div>
+
+        <div class="stat">
+            <div class="stat-title">TOTAL COLLECTED</div>
+            <div class="stat-number" id="collected">$920</div>
+        </div>
+
+        <div class="stat">
+            <div class="stat-title">SEASON CHAMPION PRIZE</div>
+            <div class="stat-number gold">$220</div>
+        </div>
+
+    </div>
+
+    <div class="players" id="players"></div>
+
+    <h2>Weekly Winners</h2>
+
+    <div id="weeks"></div>
+
+    <div class="season-winner">
+        <h2>🏆 Season Champion</h2>
+        <p>Final prize: <strong class="gold">$220</strong></p>
+
+        <select id="seasonWinner" onchange="saveData()">
+            <option value="">TBD</option>
+            <option>Arcadio</option>
+            <option>Marco</option>
+            <option>Marcos</option>
+        </select>
+    </div>
+
+    <button class="reset" onclick="resetTracker()">
+        Reset Tracker
+    </button>
+
+</div>
+
+<script>
+
+const players = {
+    Arcadio: {
+        dues: 440,
+        paid: 440
+    },
+
+    Marco: {
+        dues: 440,
+        paid: 40
+    },
+
+    Marcos: {
+        dues: 440,
+        paid: 440
+    }
+};
+
+const weekNames = [
+    "Week 1",
+    "Week 2",
+    "Week 3",
+    "Week 4",
+    "Week 5",
+    "Week 6",
+    "Week 7",
+    "Week 8",
+    "Week 9",
+    "Week 10",
+    "Week 11",
+    "Week 12",
+    "Week 13",
+    "Week 14",
+    "Week 15",
+    "Week 16",
+    "Week 17",
+    "Week 18",
+    "Wild Card",
+    "Divisional",
+    "Conference Championships",
+    "Super Bowl"
+];
+
+const WEEKLY_PRIZE = 50;
+
+let winners = Array(22).fill("");
+
+// Marco won first two weeks
+winners[0] = "Marco";
+winners[1] = "Marco";
+
+function loadData() {
+
+    const saved = localStorage.getItem("nflPickemTracker");
+
+    if (saved) {
+
+        const data = JSON.parse(saved);
+
+        if (data.winners) {
+            winners = data.winners;
+        }
+
+        if (data.players) {
+            Object.assign(players, data.players);
+        }
+
+        if (data.seasonWinner) {
+            document.getElementById("seasonWinner").value =
+                data.seasonWinner;
+        }
+    }
+
+    render();
+}
+
+function saveData() {
+
+    const seasonWinner =
+        document.getElementById("seasonWinner").value;
+
+    localStorage.setItem(
+        "nflPickemTracker",
+        JSON.stringify({
+            winners,
+            players,
+            seasonWinner
+        })
+    );
+
+    render();
+}
+
+function render() {
+
+    renderPlayers();
+    renderWeeks();
+    updateMoney();
+}
+
+function renderPlayers() {
+
+    const container =
+        document.getElementById("players");
+
+    container.innerHTML = "";
+
+    Object.keys(players).forEach(name => {
+
+        const player = players[name];
+
+        const wins =
+            winners.filter(w => w === name).length;
+
+        const winnings =
+            wins * WEEKLY_PRIZE;
+
+        const owed =
+            player.dues - player.paid;
+
+        container.innerHTML += `
+            <div class="player">
+
+                <h3>${name}</h3>
+
+                <div class="player-row">
+                    <span>Paid</span>
+                    <strong>$${player.paid}</strong>
+                </div>
+
+                <div class="player-row">
+                    <span>Owes</span>
+                    <strong>
+                        $${owed}
+                    </strong>
+                </div>
+
+                <div class="player-row">
+                    <span>Weekly Wins</span>
+                    <strong>${wins}</strong>
+                </div>
+
+                <div class="player-row">
+                    <span>Winnings</span>
+                    <strong class="green">
+                        $${winnings}
+                    </strong>
+                </div>
+
+            </div>
+        `;
+    });
+}
+
+function renderWeeks() {
+
+    const container =
+        document.getElementById("weeks");
+
+    container.innerHTML = "";
+
+    weekNames.forEach((week, index) => {
+
+        const current =
+            index === 2 ? "current" : "";
+
+        container.innerHTML += `
+            <div class="week ${current}">
+
+                <div class="week-title">
+                    ${week}
+                    ${index === 2 ? " • CURRENT" : ""}
+                </div>
+
+                <select
+                    onchange="changeWinner(${index}, this.value)"
+                >
+
+                    <option value="">
+                        TBD
+                    </option>
+
+                    <option
+                        ${winners[index] === "Arcadio"
+                        ? "selected" : ""}>
+                        Arcadio
+                    </option>
+
+                    <option
+                        ${winners[index] === "Marco"
+                        ? "selected" : ""}>
+                        Marco
+                    </option>
+
+                    <option
+                        ${winners[index] === "Marcos"
+                        ? "selected" : ""}>
+                        Marcos
+                    </option>
+
+                </select>
+
+                <div class="prize">
+                    ${winners[index]
+                        ? "$50 → " + winners[index]
+                        : "$50 Prize"}
+                </div>
+
+            </div>
+        `;
+    });
+}
+
+function changeWinner(index, winner) {
+
+    winners[index] = winner;
+
+    saveData();
+}
+
+function updateMoney() {
+
+    let totalCollected = 0;
+
+    Object.values(players).forEach(player => {
+        totalCollected += player.paid;
+    });
+
+    const completedWeeks =
+        winners.filter(w => w !== "").length;
+
+    const payouts =
+        completedWeeks * WEEKLY_PRIZE;
+
+    const currentPot =
+        totalCollected - payouts;
+
+    document.getElementById("collected")
+        .textContent =
+        "$" + totalCollected;
+
+    document.getElementById("currentPot")
+        .textContent =
+        "$" + currentPot;
+}
+
+function resetTracker() {
+
+    if (
+        confirm(
+            "Are you sure you want to reset the tracker?"
+        )
+    ) {
+        localStorage.removeItem(
+            "nflPickemTracker"
+        );
+
+        location.reload();
+    }
+}
+
+loadData();
+
+</script>
+
+</body>
+</html>
